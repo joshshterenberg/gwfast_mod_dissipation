@@ -6,7 +6,7 @@
 
 import os
 import jax
-
+from qdol_phase import gen_h0_qdol_phase ###JS_EDIT
 
 from jax.config import config
 config.update("jax_enable_x64", True)
@@ -1051,7 +1051,7 @@ class IMRPhenomD(WaveFormModel):
         alpha4 = -0.02989487384493607 + 1.4022106448583738*eta + (-0.07356049468633846 + 0.8337006542278661*eta + 0.2240008282397391*eta2 + (-0.055202870001177226 + 0.5667186343606578*eta + 0.7186931973380503*eta2)*xi + (-0.015507437354325743 + 0.15750322779277187*eta + 0.21076815715176228*eta2)*xi*xi)*xi
         alpha5 = 0.9974408278363099 - 0.007884449714907203*eta + (-0.059046901195591035 + 1.3958712396764088*eta - 4.516631601676276*eta2 + (-0.05585343136869692 + 1.7516580039343603*eta - 5.990208965347804*eta2)*xi + (-0.017945336522161195 + 0.5965097794825992*eta - 2.0608879367971804*eta2)*xi*xi)*xi
         
-        ##### Compute the tidal dissipation numbers here
+        ##### Compute the (Kerr) tidal dissipation numbers here
         m1 = m1ByM * M
         m2 = m2ByM * M
         
@@ -1069,6 +1069,20 @@ class IMRPhenomD(WaveFormModel):
         H0E = (1/M**4)*(m1**4 * H1s0wE + m2**4 * H2s0wE)
 
         delta = m1ByM - m2ByM # (m1-m2)/M
+
+        kappa1 = 0
+        kappa2 = 0
+        lambda1 = 0
+        lambda2 = 0
+        H1s3E = 0
+        H2s3E = 0
+        H1s3B = 0
+        H2s3B = 0
+        l1 = 0
+        l2 = 0
+        Deff = 0
+        tc = 0
+        phic = 0
         ####
 
         # Compute the TF2 phase coefficients and put them in a dictionary (spin effects are included up to 3.5PN)
@@ -1187,6 +1201,12 @@ class IMRPhenomD(WaveFormModel):
         f_tape = f22_peak * 0.35 #custom alpha
         print(f_tape)
         Phipart1 = []
+
+        theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2, Deff, tc, phic)
+        Phi_TDN_full = gen_h0_qdol_phase(f, theta_more, phiRef, alpha=0.35, fix_bh_superradiance=True, EBdual=True) ##assuming ref frequency is the same.
+
+        Phi_TDN = Phi_TDN_full ## comment out to revert / not use qdol_phase.
+        
         for freq in range(len(fgrid)):
           if fgrid[freq] < f_tape:
             Phipart1.append(Phi_default[freq] + Phi_TDN[freq])
