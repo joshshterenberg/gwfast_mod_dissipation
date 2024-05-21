@@ -6,9 +6,12 @@ Useful for implementing custom waveform models.
 """
 
 import warnings
+import os, sys
+sys.path.append('../cogwheel') ##JS_EDIT necessary for local conda installation, edit as needed.
 from cogwheel import waveform
 from cogwheel.waveform import Approximant
 import numpy as np
+import jax.numpy as jnp
 
 ###################################################################################
 #################### Tidal waveform model params and functions ####################
@@ -62,9 +65,9 @@ def phase_qdol(f, theta, fix_bh_superradiance, EBdual):
         
     # Mass parameters
     M = Mc / (eta ** (3 / 5))
-    m1 = (M + np.sqrt(M**2 - 4 * (eta * M**2))) / 2
-    m2 = (M - np.sqrt(M**2 - 4 * (eta * M**2))) / 2
-    delta = np.sqrt(1.0 - 4.0 * eta)
+    m1 = (M + jnp.sqrt(M**2 - 4 * (eta * M**2))) / 2
+    m2 = (M - jnp.sqrt(M**2 - 4 * (eta * M**2))) / 2
+    delta = jnp.sqrt(1.0 - 4.0 * eta)
 
     # Convenient variables
     # vlso doesn't matter for 2.5PN and 4PN constant log(v/vlso) terms (absorbed into overall phase and time)
@@ -153,7 +156,7 @@ def phase_qdol(f, theta, fix_bh_superradiance, EBdual):
     
     ############ Tidal Dissipation Numbers (Schwarzschild) ############
     
-    psi_TDN_NS_4PN = 25.0 / 2.0 * h0 * v8 * (1.0 - 3.0 * np.log(v / vlso))
+    psi_TDN_NS_4PN = 25.0 / 2.0 * h0 * v8 * (1.0 - 3.0 * jnp.log(v / vlso))
     
     
     ######################### ----- (Aligned) Spin part of the waveform ----- #########################        
@@ -229,7 +232,7 @@ def phase_qdol(f, theta, fix_bh_superradiance, EBdual):
 
     # 2.5PN linear-in-spin dissipation
     
-    psi_TDN_S_25PN = (25.0*hs_E*chi_s/4.0 + 25.0*ha_E* chi_a/4.0) * v5 * (1 + 3.0 * np.log(v / vlso))
+    psi_TDN_S_25PN = (25.0*hs_E*chi_s/4.0 + 25.0*ha_E* chi_a/4.0) * v5 * (1 + 3.0 * jnp.log(v / vlso))
     
     # 3.5PN linear- and cubic-in-spin dissipation 
     psi_TDN_S_35PN = (225.0 / 8.0 * ha_B + 102975.0 / 448.0 * ha_E + 1425.0 / 16 * eta * ha_E + 675.0 / 32.0 * delta * hs_E
@@ -305,20 +308,20 @@ def PN4_pp_phase(f, theta):
     psi_NS_4PN = (- 90490.0 * PI**2 / 567.0 
                   - 36812.0 * EulerGamma / 189.0 
                   + 2550713843998885153.0 / 830425530654720.0 
-                  - 26325.0 / 196.0 * np.log(3) 
-                  - 1011020.0 / 3969.0 * np.log(2) 
+                  - 26325.0 / 196.0 * jnp.log(3) 
+                  - 1011020.0 / 3969.0 * jnp.log(2) 
                   + (- 680712846248317.0 / 126743823360.0 
                      - 3911888.0 * EulerGamma / 3969.0 
                      + 109295.0 * PI**2 / 672.0 
-                     - 9964112.0 / 3969.0 * np.log(2) 
-                     + 26325.0 / 49.0 * np.log(3)
+                     - 9964112.0 / 3969.0 * jnp.log(2) 
+                     + 26325.0 / 49.0 * jnp.log(3)
                     ) * eta
                   + (7510073635.0 / 9144576.0 - 11275.0 / 432.0 * PI**2) * eta2
                   + 1292395.0 / 36288.0 * eta3 
                   - 5975.0 / 288.0 * eta4 
-                  ) * v8 * (1.0 - 3.0 * np.log(v / vlso))
+                  ) * v8 * (1.0 - 3.0 * jnp.log(v / vlso))
     
-    psi_NS_4PN_log2 = (18406.0 / 63.0  + 1955944.0 / 1323.0 * eta) * v8 * np.log(v / vlso)**2
+    psi_NS_4PN_log2 = (18406.0 / 63.0  + 1955944.0 / 1323.0 * eta) * v8 * jnp.log(v / vlso)**2
     
     return 3.0 / 128.0 / eta / v5 * (psi_NS_4PN + psi_NS_4PN_log2)
 
@@ -344,10 +347,9 @@ def compute_f22_peak(M, eta, chi_EOB):
     A4 = p4EQ + 4.0 * (p4EQ - p4TPL) * (eta - 1.0/4.0)
     
     
-    f22_peak = (p0TPL + (p1TPL + p2TPL * chi_EOB) * np.log(A3 - A4 * chi_EOB)) / (G * MSUN / C**3) / (2.0 * PI) / M
+    f22_peak = (p0TPL + (p1TPL + p2TPL * chi_EOB) * jnp.log(A3 - A4 * chi_EOB)) / (G * MSUN / C**3) / (2.0 * PI) / M
     
     return f22_peak
-
 
 
 
@@ -372,7 +374,6 @@ def gen_h0_qdol_phase(f, theta_more, f_ref, alpha=1.0,fix_bh_superradiance=True,
     Strain (array): GW frequency-domain strain as a function of frequency
     
     """
-    
     # theta_more ordering: Mc, eta, chi_1, chi_2, kappa1, kappa2, h1s1_E, h2s1_E, h1s1_B, h2s1_B, lambda1, lambda2, \
     #h1s3_E, h2s3_E, h1s3_B, h2s3_B, h1s0,h2s0, l1, l2, Deff, tc, phic
     Mc, eta, chi_1, chi_2, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Deff, tc, phic = theta_more
@@ -380,7 +381,7 @@ def gen_h0_qdol_phase(f, theta_more, f_ref, alpha=1.0,fix_bh_superradiance=True,
     pre = 3.6686934875530996e-19  # (GN*Msun/c^3)^(5/6)/Hz^(7/6)*c/Mpc/sec
     chi_s = 0.5 * (chi_1 + chi_2)
     chi_a = 0.5 * (chi_1 - chi_2)
-    delta = np.sqrt(1.0 - 4.0 * eta)
+    delta = jnp.sqrt(1.0 - 4.0 * eta)
     chi_EOB = chi_s + chi_a * delta / (1.0 - 2.0 * eta)   
     Mchirp = M * eta**0.6
 
@@ -388,11 +389,10 @@ def gen_h0_qdol_phase(f, theta_more, f_ref, alpha=1.0,fix_bh_superradiance=True,
     TDN_Phi = phase_qdol(f, theta_more[:-3],fix_bh_superradiance,EBdual) #+ PN4_pp_phase(f, theta_more[:-3])
     
     f_tape = compute_f22_peak(M, eta, chi_EOB) * alpha
-    
-    if len(TDN_Phi[f>f_tape])>0:
-        TDN_Phi_tape = TDN_Phi[f>f_tape][0]
-        TDN_Phi[f>f_tape] = TDN_Phi_tape
-    
+
+    #if len(TDN_Phi[f>f_tape])>0:
+    #    TDN_Phi_tape = TDN_Phi[f>f_tape][0]
+    #    TDN_Phi[f>f_tape] = TDN_Phi_tape
 
     
     TDN_Phi_ref = phase_qdol(f_ref, theta_more[:-3],fix_bh_superradiance,EBdual)

@@ -14,6 +14,7 @@ config.update("jax_enable_x64", True)
 # We use both the original numpy, denoted as onp, and the JAX implementation of numpy, denoted as np
 import numpy as onp
 import jax.numpy as np
+import jax.lax as lax
 from jax import custom_jvp
 
 from abc import ABC, abstractmethod
@@ -1199,20 +1200,23 @@ class IMRPhenomD(WaveFormModel):
         A4 = p4EQ + 4.0 * (p4EQ - p4TPL) * (eta - 1.0/4.0)
         f22_peak = (p0TPL + (p1TPL + p2TPL * chi_EOB) * np.log(A3 - A4 * chi_EOB)) / (G * MSUN / C**3) / (2.0 * PI) / M
         f_tape = f22_peak * 0.35 #custom alpha
-        print(f_tape)
         Phipart1 = []
 
         theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2, Deff, tc, phic)
         Phi_TDN_full = gen_h0_qdol_phase(f, theta_more, phiRef, alpha=0.35, fix_bh_superradiance=True, EBdual=True) ##assuming ref frequency is the same.
 
         Phi_TDN = Phi_TDN_full ## comment out to revert / not use qdol_phase.
-        
-        for freq in range(len(fgrid)):
-          if fgrid[freq] < f_tape:
-            Phipart1.append(Phi_default[freq] + Phi_TDN[freq])
-          else:
-            Phipart1.append(Phi_default[freq] + Phi_TDN[f_tape])
 
+        
+        #for freq in range(len(fgrid)):
+        #  if fgrid[freq].primal.val < f_tape.primal.val:
+        #    Phipart1.append(Phi_default[freq] + Phi_TDN[freq])
+        #  else:
+        #    Phipart1.append(Phi_default[freq] + Phi_TDN[f_tape])
+        #print(f_tape)
+        if hasattr(f_tape, 'primal'): 
+            f_tape = f_tape.primal.val
+        Phipart1 = Phi_default + np.where(fgrid < f_tape, Phi_TDN, Phi_TDN[int(f_tape[0])])
         return Phipart1
 
     def Phi_reg(self, f, **kwargs):
