@@ -1031,159 +1031,49 @@ class IMRPhenomD(WaveFormModel):
         fring = np.interp(aeff.real, self.QNMgrid_a, self.QNMgrid_fring) / (1.0 - Erad)
         fdamp = np.interp(aeff.real, self.QNMgrid_a, self.QNMgrid_fdamp) / (1.0 - Erad)
         
-        # Compute sigma coefficients appearing in arXiv:1508.07253 eq. (28)
-        # They derive from a fit, whose numerical coefficients are in arXiv:1508.07253 Tab. 5
-        sigma1 = 2096.551999295543 + 1463.7493168261553*eta + (1312.5493286098522 + 18307.330017082117*eta - 43534.1440746107*eta2 + (-833.2889543511114 + 32047.31997183187*eta - 108609.45037520859*eta2)*xi + (452.25136398112204 + 8353.439546391714*eta - 44531.3250037322*eta2)*xi*xi)*xi
-        sigma2 = -10114.056472621156 - 44631.01109458185*eta + (-6541.308761668722 - 266959.23419307504*eta + 686328.3229317984*eta2 + (3405.6372187679685 - 437507.7208209015*eta + 1.6318171307344697e6*eta2)*xi + (-7462.648563007646 - 114585.25177153319*eta + 674402.4689098676*eta2)*xi*xi)*xi
-        sigma3 = 22933.658273436497 + 230960.00814979506*eta + (14961.083974183695 + 1.1940181342318142e6*eta - 3.1042239693052764e6*eta2 + (-3038.166617199259 + 1.8720322849093592e6*eta - 7.309145012085539e6*eta2)*xi + (42738.22871475411 + 467502.018616601*eta - 3.064853498512499e6*eta2)*xi*xi)*xi
-        sigma4 = -14621.71522218357 - 377812.8579387104*eta + (-9608.682631509726 - 1.7108925257214056e6*eta + 4.332924601416521e6*eta2 + (-22366.683262266528 - 2.5019716386377467e6*eta + 1.0274495902259542e7*eta2)*xi + (-85360.30079034246 - 570025.3441737515*eta + 4.396844346849777e6*eta2)*xi*xi)*xi
         
-        # Compute beta coefficients appearing in arXiv:1508.07253 eq. (16)
-        # They derive from a fit, whose numerical coefficients are in arXiv:1508.07253 Tab. 5
-        beta1 = 97.89747327985583 - 42.659730877489224*eta + (153.48421037904913 - 1417.0620760768954*eta + 2752.8614143665027*eta2 + (138.7406469558649 - 1433.6585075135881*eta + 2857.7418952430758*eta2)*xi + (41.025109467376126 - 423.680737974639*eta + 850.3594335657173*eta2)*xi*xi)*xi
-        beta2 = -3.282701958759534 - 9.051384468245866*eta + (-12.415449742258042 + 55.4716447709787*eta - 106.05109938966335*eta2 + (-11.953044553690658 + 76.80704618365418*eta - 155.33172948098394*eta2)*xi + (-3.4129261592393263 + 25.572377569952536*eta - 54.408036707740465*eta2)*xi*xi)*xi
-        beta3 = -0.000025156429818799565 + 0.000019750256942201327*eta + (-0.000018370671469295915 + 0.000021886317041311973*eta + 0.00008250240316860033*eta2 + (7.157371250566708e-6 - 0.000055780000112270685*eta + 0.00019142082884072178*eta2)*xi + (5.447166261464217e-6 - 0.00003220610095021982*eta + 0.00007974016714984341*eta2)*xi*xi)*xi
-        
-        # Compute alpha coefficients appearing in arXiv:1508.07253 eq. (14)
-        # They derive from a fit, whose numerical coefficients are in arXiv:1508.07253 Tab. 5
-        alpha1 = 43.31514709695348 + 638.6332679188081*eta + (-32.85768747216059 + 2415.8938269370315*eta - 5766.875169379177*eta2 + (-61.85459307173841 + 2953.967762459948*eta - 8986.29057591497*eta2)*xi + (-21.571435779762044 + 981.2158224673428*eta - 3239.5664895930286*eta2)*xi*xi)*xi
-        alpha2 = -0.07020209449091723 - 0.16269798450687084*eta + (-0.1872514685185499 + 1.138313650449945*eta - 2.8334196304430046*eta2 + (-0.17137955686840617 + 1.7197549338119527*eta - 4.539717148261272*eta2)*xi + (-0.049983437357548705 + 0.6062072055948309*eta - 1.682769616644546*eta2)*xi*xi)*xi
-        alpha3 = 9.5988072383479 - 397.05438595557433*eta + (16.202126189517813 - 1574.8286986717037*eta + 3600.3410843831093*eta2 + (27.092429659075467 - 1786.482357315139*eta + 5152.919378666511*eta2)*xi + (11.175710130033895 - 577.7999423177481*eta + 1808.730762932043*eta2)*xi*xi)*xi
-        alpha4 = -0.02989487384493607 + 1.4022106448583738*eta + (-0.07356049468633846 + 0.8337006542278661*eta + 0.2240008282397391*eta2 + (-0.055202870001177226 + 0.5667186343606578*eta + 0.7186931973380503*eta2)*xi + (-0.015507437354325743 + 0.15750322779277187*eta + 0.21076815715176228*eta2)*xi*xi)*xi
-        alpha5 = 0.9974408278363099 - 0.007884449714907203*eta + (-0.059046901195591035 + 1.3958712396764088*eta - 4.516631601676276*eta2 + (-0.05585343136869692 + 1.7516580039343603*eta - 5.990208965347804*eta2)*xi + (-0.017945336522161195 + 0.5965097794825992*eta - 2.0608879367971804*eta2)*xi*xi)*xi
         
         ##### Compute the (Kerr) tidal dissipation numbers here
         m1 = m1ByM * M
         m2 = m2ByM * M
         
-        H1s1E = 100#-(8./45.)*(1+3*chi12)
-        H1s1B = -(8./45.)*(1+3*chi12)
-        H2s1E = -(8./45.)*(1+3*chi22)
-        H2s1B = -(8./45.)*(1+3*chi22)
-        H1s0wE = 100#(8./45.)*(1 + (1-chi12)**0.5)
-        H2s0wE = (8./45.)*(1 + (1-chi22)**0.5)
+        H1s1E = -(8./45.)*(1+3*chi12)#kwargs['H1s1E']
+        H1s1B = -(8./45.)*(1+3*chi12)#kwargs['H1s1B']
+        H2s1E = -(8./45.)*(1+3*chi22)#kwargs['H2s1E']
+        H2s1B = -(8./45.)*(1+3*chi22)#kwargs['H2s1B']
+        H1s0wE = (8./45.)*(1 + (1-chi12)**0.5)#kargs['H1swE']
+        H2s0wE = (8./45.)*(1 + (1-chi22)**0.5)#kargs['H1swE']
         
-        H1E = (1/M**3)*(m1**3 * H1s1E + m2**3 * H2s1E)
-        H1B = (1/M**3)*(m1**3 * H1s1B + m2**3 * H2s1B)
-        Hbar1E = (1/M**3)*(m1**3 * H1s1E - m2**3 * H2s1E)
-        Hbar1B = (1/M**3)*(m1**3 * H1s1B - m2**3 * H2s1B)
-        H0E = (1/M**4)*(m1**4 * H1s0wE + m2**4 * H2s0wE)
+        ### Zihan: this seems redundant
+        
+        #H1E = (1/M**3)*(m1**3 * H1s1E + m2**3 * H2s1E)
+        #H1B = (1/M**3)*(m1**3 * H1s1B + m2**3 * H2s1B)
+        #Hbar1E = (1/M**3)*(m1**3 * H1s1E - m2**3 * H2s1E)
+        #Hbar1B = (1/M**3)*(m1**3 * H1s1B - m2**3 * H2s1B)
+        #H0E = (1/M**4)*(m1**4 * H1s0wE + m2**4 * H2s0wE)
+        
+        ###
 
         delta = m1ByM - m2ByM # (m1-m2)/M
 
-        kappa1 = 0
-        kappa2 = 0
-        lambda1 = 0
-        lambda2 = 0
-        H1s3E = 0
-        H2s3E = 0
-        H1s3B = 0
-        H2s3B = 0
-        l1 = 0
-        l2 = 0
-        Deff = 0
-        tc = 0
-        phic = 0
-        ####
-
-        # Compute the TF2 phase coefficients and put them in a dictionary (spin effects are included up to 3.5PN)
-        TF2coeffs = {}
-        TF2OverallAmpl = 3./(128. * eta)
+        kappa1 = 0 #kwargs['kappa1']
+        kappa2 = 0 #kwargs['kappa2']
+        lambda1 = 0 #kwargs['lambda1']
+        lambda2 = 0 #kwargs['lambda2']
+        H1s3E = 0 #kwargs['H1s3E']
+        H2s3E = 0 #kwargs['H2s3E']
+        H1s3B = 0 #kwargs['H1s3B']
+        H2s3B = 0 #kwargs['H2s3B']
+        l1 = 0 #kwargs['l1']
+        l2 = 0 #kwargs['l2']
         
-        TF2coeffs['five'] = (25./4.)*H1E*chi_s + (25./4.)*Hbar1E*chi_a 
-        TF2coeffs['seven'] = ((225./8.)*H1B + (102975./448.)*H1E + (675./32.)*Hbar1E*delta + (1425./16.)*H1E*eta)*chi_s + ((225./8.)*Hbar1B + (102975./448.)*Hbar1E + (675./32.)*H1E*delta + (1425./16.)*Hbar1E*eta)*chi_a
-        TF2coeffs['eight'] = (25./2.)*H0E
-
-        TF2coeffs['zero'] = 0.
-        TF2coeffs['one'] = 0.
-        TF2coeffs['two'] = 0.
-        TF2coeffs['three'] = 0.
-        TF2coeffs['four'] = 0.
-        TF2coeffs['five_log'] = 0.
-        TF2coeffs['six'] = 0.
-        TF2coeffs['six_log'] = 0.
         
-        PhiInspcoeffs = {}
-        
-        PhiInspcoeffs['initial_phasing'] = TF2coeffs['five']*TF2OverallAmpl
-        PhiInspcoeffs['two_thirds'] = TF2coeffs['seven']*TF2OverallAmpl*(np.pi**(2./3.))
-        PhiInspcoeffs['three_thirds'] = TF2coeffs['eight']*TF2OverallAmpl*np.pi
-        PhiInspcoeffs['third'] = 0#TF2coeffs['six']*TF2OverallAmpl*(np.pi**(1./3.))
-        PhiInspcoeffs['third_log'] = 0#TF2coeffs['six_log']*TF2OverallAmpl*(np.pi**(1./3.))
-        PhiInspcoeffs['log'] = 0#TF2coeffs['five_log']*TF2OverallAmpl
-        PhiInspcoeffs['min_third'] = 0#TF2coeffs['four']*TF2OverallAmpl*(np.pi**(-1./3.))
-        PhiInspcoeffs['min_two_thirds'] = 0#TF2coeffs['three']*TF2OverallAmpl*(np.pi**(-2./3.))
-        PhiInspcoeffs['min_one'] = 0#TF2coeffs['two']*TF2OverallAmpl/np.pi
-        PhiInspcoeffs['min_four_thirds'] = 0#TF2coeffs['one']*TF2OverallAmpl*(np.pi**(-4./3.))
-        PhiInspcoeffs['min_five_thirds'] = 0#TF2coeffs['zero']*TF2OverallAmpl*(np.pi**(-5./3.))
-        PhiInspcoeffs['one'] = sigma1
-        PhiInspcoeffs['four_thirds'] = sigma2 * 0.75
-        PhiInspcoeffs['five_thirds'] = sigma3 * 0.6
-        PhiInspcoeffs['two'] = sigma4 * 0.5
-        
-        #Now compute the coefficients to align the three parts
-        
-        fInsJoin = self.PHI_fJoin_INS
-        fMRDJoin = 0.5*fring
-        
-        # First the Inspiral - Intermediate: we compute C1Int and C2Int coeffs
-        # Equations to solve for to get C(1) continuous join
-        # PhiIns (f)  =   PhiInt (f) + C1Int + C2Int f
-        # Joining at fInsJoin
-        # PhiIns (fInsJoin)  =   PhiInt (fInsJoin) + C1Int + C2Int fInsJoin
-        # PhiIns'(fInsJoin)  =   PhiInt'(fInsJoin) + C2Int
-        # This is the first derivative wrt f of the inspiral phase computed at fInsJoin, first add the PN contribution and then the higher order calibrated terms
-        DPhiIns = (2.0*TF2coeffs['seven']*TF2OverallAmpl*((np.pi*fInsJoin)**(7./3.)) + (TF2coeffs['six']*TF2OverallAmpl + TF2coeffs['six_log']*TF2OverallAmpl * (1.0 + np.log(np.pi*fInsJoin)/3.))*((np.pi*fInsJoin)**(2.)) + TF2coeffs['five_log']*TF2OverallAmpl*((np.pi*fInsJoin)**(5./3.)) - TF2coeffs['four']*TF2OverallAmpl*((np.pi*fInsJoin)**(4./3.)) - 2.*TF2coeffs['three']*TF2OverallAmpl*(np.pi*fInsJoin) - 3.*TF2coeffs['two']*TF2OverallAmpl*((np.pi*fInsJoin)**(2./3.)) - 4.*TF2coeffs['one']*TF2OverallAmpl*((np.pi*fInsJoin)**(1./3.)) - 5.*TF2coeffs['zero']*TF2OverallAmpl)*np.pi/(3.*((np.pi*fInsJoin)**(8./3.)))
-        DPhiIns = DPhiIns + (sigma1 + sigma2*(fInsJoin**(1./3.)) + sigma3*(fInsJoin**(2./3.)) + sigma4*fInsJoin)/eta
-        # This is the first derivative of the Intermediate phase computed at fInsJoin
-        DPhiInt = (beta1 + beta3/(fInsJoin**4) + beta2/fInsJoin)/eta
-        
-        C2Int = DPhiIns - DPhiInt
-        
-        # This is the inspiral phase computed at fInsJoin
-        PhiInsJoin = PhiInspcoeffs['initial_phasing'] + PhiInspcoeffs['two_thirds']*(fInsJoin**(2./3.)) + PhiInspcoeffs['third']*(fInsJoin**(1./3.)) + PhiInspcoeffs['third_log']*(fInsJoin**(1./3.))*np.log(np.pi*fInsJoin)/3. + PhiInspcoeffs['log']*np.log(np.pi*fInsJoin)/3. + PhiInspcoeffs['min_third']*(fInsJoin**(-1./3.)) + PhiInspcoeffs['min_two_thirds']*(fInsJoin**(-2./3.)) + PhiInspcoeffs['min_one']/fInsJoin + PhiInspcoeffs['min_four_thirds']*(fInsJoin**(-4./3.)) + PhiInspcoeffs['min_five_thirds']*(fInsJoin**(-5./3.)) + (PhiInspcoeffs['one']*fInsJoin + PhiInspcoeffs['four_thirds']*(fInsJoin**(4./3.)) + PhiInspcoeffs['five_thirds']*(fInsJoin**(5./3.)) + PhiInspcoeffs['two']*fInsJoin*fInsJoin)/eta
-        # This is the Intermediate phase computed at fInsJoin
-        PhiIntJoin = beta1*fInsJoin - beta3/(3.*fInsJoin*fInsJoin*fInsJoin) + beta2*np.log(fInsJoin)
-        
-        C1Int = PhiInsJoin - PhiIntJoin/eta - C2Int*fInsJoin
-        
-        # Now the same for Intermediate - Merger-Ringdown: we also need a temporary Intermediate Phase function
-        PhiIntTempVal  = (beta1*fMRDJoin - beta3/(3.*fMRDJoin*fMRDJoin*fMRDJoin) + beta2*np.log(fMRDJoin))/eta + C1Int + C2Int*fMRDJoin
-        DPhiIntTempVal = C2Int + (beta1 + beta3/(fMRDJoin**4) + beta2/fMRDJoin)/eta
-        DPhiMRDVal     = (alpha1 + alpha2/(fMRDJoin*fMRDJoin) + alpha3/(fMRDJoin**(1./4.)) + alpha4/(fdamp*(1. + (fMRDJoin - alpha5*fring)*(fMRDJoin - alpha5*fring)/(fdamp*fdamp))))/eta
-        PhiMRJoinTemp  = -(alpha2/fMRDJoin) + (4.0/3.0) * (alpha3 * (fMRDJoin**(3./4.))) + alpha1 * fMRDJoin + alpha4 * np.arctan((fMRDJoin - alpha5 * fring)/fdamp)
-        
-        C2MRD = DPhiIntTempVal - DPhiMRDVal
-        C1MRD = PhiIntTempVal - PhiMRJoinTemp/eta - C2MRD*fMRDJoin
-        
-        # Time shift so that peak amplitude is approximately at t=0
-        gamma2 = 1.010344404799477 + 0.0008993122007234548*eta + (0.283949116804459 - 4.049752962958005*eta + 13.207828172665366*eta2 + (0.10396278486805426 - 7.025059158961947*eta + 24.784892370130475*eta2)*xi + (0.03093202475605892 - 2.6924023896851663*eta + 9.609374464684983*eta2)*xi*xi)*xi
-        gamma3 = 1.3081615607036106 - 0.005537729694807678*eta +(-0.06782917938621007 - 0.6689834970767117*eta + 3.403147966134083*eta2 + (-0.05296577374411866 - 0.9923793203111362*eta + 4.820681208409587*eta2)*xi + (-0.006134139870393713 - 0.38429253308696365*eta + 1.7561754421985984*eta2)*xi*xi)*xi
-        fpeak = np.where(gamma2 >= 1.0, np.fabs(fring - (fdamp*gamma3)/gamma2), np.fabs(fring + (fdamp*(-1.0 + np.sqrt(1.0 - gamma2*gamma2))*gamma3)/gamma2))
-        
-        t0 = (alpha1 + alpha2/(fpeak*fpeak) + alpha3/(fpeak**(1./4.)) + alpha4/(fdamp*(1. + (fpeak - alpha5*fring)*(fpeak - alpha5*fring)/(fdamp*fdamp))))/eta
-        
-        # LAL sets fRef as the minimum frequency, do the same
-        fRef   = np.amin(fgrid, axis=0)
-        if self.fRef is not None:
-            fRef = M*glob.GMsun_over_c3*self.fRef
-        if self.apply_fcut:
-            phiRef = np.where(fRef < self.PHI_fJoin_INS, PhiInspcoeffs['initial_phasing'] + PhiInspcoeffs['two_thirds']*(fRef**(2./3.)) + PhiInspcoeffs['third']*(fRef**(1./3.)) + PhiInspcoeffs['third_log']*(fRef**(1./3.))*np.log(np.pi*fRef)/3. + PhiInspcoeffs['log']*np.log(np.pi*fRef)/3. + PhiInspcoeffs['min_third']*(fRef**(-1./3.)) + PhiInspcoeffs['min_two_thirds']*(fRef**(-2./3.)) + PhiInspcoeffs['min_one']/fRef + PhiInspcoeffs['min_four_thirds']*(fRef**(-4./3.)) + PhiInspcoeffs['min_five_thirds']*(fRef**(-5./3.)) + (PhiInspcoeffs['one']*fRef + PhiInspcoeffs['four_thirds']*(fRef**(4./3.)) + PhiInspcoeffs['five_thirds']*(fRef**(5./3.)) + PhiInspcoeffs['two']*fRef*fRef)/eta, np.where(fRef<fMRDJoin, (beta1*fRef - beta3/(3.*fRef*fRef*fRef) + beta2*np.log(fRef))/eta + C1Int + C2Int*fRef, np.where(fRef < self.fcutPar, (-(alpha2/fRef) + (4.0/3.0) * (alpha3 * (fRef**(3./4.))) + alpha1 * fRef + alpha4 * np.arctan((fRef - alpha5 * fring)/fdamp))/eta + C1MRD + C2MRD*fRef,0.)))
-
-            phis = np.where(fgrid < self.PHI_fJoin_INS, PhiInspcoeffs['initial_phasing'] + PhiInspcoeffs['two_thirds']*(fgrid**(2./3.)) + PhiInspcoeffs['third']*(fgrid**(1./3.)) + PhiInspcoeffs['third_log']*(fgrid**(1./3.))*np.log(np.pi*fgrid)/3. + PhiInspcoeffs['log']*np.log(np.pi*fgrid)/3. + PhiInspcoeffs['min_third']*(fgrid**(-1./3.)) + PhiInspcoeffs['min_two_thirds']*(fgrid**(-2./3.)) + PhiInspcoeffs['min_one']/fgrid + PhiInspcoeffs['min_four_thirds']*(fgrid**(-4./3.)) + PhiInspcoeffs['min_five_thirds']*(fgrid**(-5./3.)) + (PhiInspcoeffs['one']*fgrid + PhiInspcoeffs['four_thirds']*(fgrid**(4./3.)) + PhiInspcoeffs['five_thirds']*(fgrid**(5./3.)) + PhiInspcoeffs['two']*fgrid*fgrid)/eta, np.where(fgrid<fMRDJoin, (beta1*fgrid - beta3/(3.*fgrid*fgrid*fgrid) + beta2*np.log(fgrid))/eta + C1Int + C2Int*fgrid, np.where(fgrid < self.fcutPar, (-(alpha2/fgrid) + (4.0/3.0) * (alpha3 * (fgrid**(3./4.))) + alpha1 * fgrid + alpha4 * np.arctan((fgrid - alpha5 * fring)/fdamp))/eta + C1MRD + C2MRD*fgrid,0.)))
-            
-            Phi_TDN = phis + np.where(fgrid < self.fcutPar, - t0*(fgrid - fRef) - phiRef, 0.)
-        else:
-            phiRef = np.where(fRef < self.PHI_fJoin_INS, PhiInspcoeffs['initial_phasing'] + PhiInspcoeffs['two_thirds']*(fRef**(2./3.)) + PhiInspcoeffs['third']*(fRef**(1./3.)) + PhiInspcoeffs['third_log']*(fRef**(1./3.))*np.log(np.pi*fRef)/3. + PhiInspcoeffs['log']*np.log(np.pi*fRef)/3. + PhiInspcoeffs['min_third']*(fRef**(-1./3.)) + PhiInspcoeffs['min_two_thirds']*(fRef**(-2./3.)) + PhiInspcoeffs['min_one']/fRef + PhiInspcoeffs['min_four_thirds']*(fRef**(-4./3.)) + PhiInspcoeffs['min_five_thirds']*(fRef**(-5./3.)) + (PhiInspcoeffs['one']*fRef + PhiInspcoeffs['four_thirds']*(fRef**(4./3.)) + PhiInspcoeffs['five_thirds']*(fRef**(5./3.)) + PhiInspcoeffs['two']*fRef*fRef)/eta, np.where(fRef<fMRDJoin, (beta1*fRef - beta3/(3.*fRef*fRef*fRef) + beta2*np.log(fRef))/eta + C1Int + C2Int*fRef, (-(alpha2/fRef) + (4.0/3.0) * (alpha3 * (fRef**(3./4.))) + alpha1 * fRef + alpha4 * np.arctan((fRef - alpha5 * fring)/fdamp))/eta + C1MRD + C2MRD*fRef))
-
-            phis = np.where(fgrid < self.PHI_fJoin_INS, PhiInspcoeffs['initial_phasing'] + PhiInspcoeffs['two_thirds']*(fgrid**(2./3.)) + PhiInspcoeffs['third']*(fgrid**(1./3.)) + PhiInspcoeffs['third_log']*(fgrid**(1./3.))*np.log(np.pi*fgrid)/3. + PhiInspcoeffs['log']*np.log(np.pi*fgrid)/3. + PhiInspcoeffs['min_third']*(fgrid**(-1./3.)) + PhiInspcoeffs['min_two_thirds']*(fgrid**(-2./3.)) + PhiInspcoeffs['min_one']/fgrid + PhiInspcoeffs['min_four_thirds']*(fgrid**(-4./3.)) + PhiInspcoeffs['min_five_thirds']*(fgrid**(-5./3.)) + (PhiInspcoeffs['one']*fgrid + PhiInspcoeffs['four_thirds']*(fgrid**(4./3.)) + PhiInspcoeffs['five_thirds']*(fgrid**(5./3.)) + PhiInspcoeffs['two']*fgrid*fgrid)/eta, np.where(fgrid<fMRDJoin, (beta1*fgrid - beta3/(3.*fgrid*fgrid*fgrid) + beta2*np.log(fgrid))/eta + C1Int + C2Int*fgrid, (-(alpha2/fgrid) + (4.0/3.0) * (alpha3 * (fgrid**(3./4.))) + alpha1 * fgrid + alpha4 * np.arctan((fgrid - alpha5 * fring)/fdamp))/eta + C1MRD + C2MRD*fgrid))
-            
-            Phi_TDN = phis - t0*(fgrid - fRef) - phiRef
-
+        #####
 
 
         Phi_default = self.Phi_reg(f, **kwargs)
 
+        ### Zihan: This also seems redundant
         MSUN = 1.988409902147041637325262574352366540e30  # solar mass in kg
         G = 6.67430e-11  # m^3 / kg / s^2 # Newton's gravitational constant
         C = 299792458.0  # m / s # speed of light
@@ -1200,9 +1090,11 @@ class IMRPhenomD(WaveFormModel):
         A4 = p4EQ + 4.0 * (p4EQ - p4TPL) * (eta - 1.0/4.0)
         f22_peak = (p0TPL + (p1TPL + p2TPL * chi_EOB) * np.log(A3 - A4 * chi_EOB)) / (G * MSUN / C**3) / (2.0 * PI) / M
         f_tape = f22_peak * 0.35 #custom alpha
+        ###
+        
         Phipart1 = []
 
-        theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2, Deff, tc, phic)
+        theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2)
         Phi_TDN_full = gen_h0_qdol_phase(f, theta_more, phiRef, alpha=0.35, fix_bh_superradiance=True, EBdual=True) ##assuming ref frequency is the same.
 
         Phi_TDN = Phi_TDN_full ## comment out to revert / not use qdol_phase.
