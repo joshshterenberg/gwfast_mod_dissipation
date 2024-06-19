@@ -558,6 +558,8 @@ class GWSignal(object):
             
         ### Zihan: add dissipation and other finite size effects here
         if self.wf_model.is_s0Diss:
+            ### please change : H1s0wE, H2s0wE = ... analog of Love numbers
+            
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
         ###
@@ -885,12 +887,14 @@ class GWSignal(object):
             ecc = np.zeros(Mc.shape)
             
         
-        ### Zihan: add dissipation parameter here    
+        ### Zihan: add dissipation parameter here: modify this part to an analog with line 868-879   
         if self.wf_model.is_s0Diss:
             try:
                 H1s0wE, H2s0wE = evParams['H1s0wE'].astype('complex128'), evParams['H2s0wE'].astype('complex128')
             except KeyError:
                 raise ValueError('Dissipation has not be provided')
+        else:
+            H1s0wE, H2s0wE = np.zeros(Mc.shape), np.zeros(Mc.shape)
         ###
             
         fcut = self.wf_model.fcut(**evParams)
@@ -923,7 +927,7 @@ class GWSignal(object):
         allFishers=[]
         
         if self.detector_shape=='L': 
-            # Compute derivatives
+            # Compute derivatives ### Zihan: change the name of variables to H0Tilde and deltaH0 and functions below. 
             FisherDerivs = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H1s0wE, H2s0wE, rot=0., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
             # Change the units of the tcoal derivative from days to seconds (this improves conditioning)
             FisherDerivs = onp.array(FisherDerivs)
