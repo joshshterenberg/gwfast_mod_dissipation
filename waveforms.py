@@ -146,9 +146,8 @@ class WaveFormModel(ABC):
             self.ParNums.pop('chi2y')
             self.ParNums.pop('iota')
             
-        ## Zihan: Here we incldue all the finite size effects: please change H1s0wE H2s0wE to H0Tilde and deltaH0
         if (is_tidal) and (is_s0Diss) and (not is_Precessing) and (not is_eccentric):
-            self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H1s0wE':13, 'H2s0wE':14}
+            self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H0Tilde':13, 'deltaH0':14}
             self.nParams = 15
         ## End of including finite size
         
