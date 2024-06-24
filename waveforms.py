@@ -6,7 +6,7 @@
 
 import os
 import jax
-from gwfast import qdol_phase ###Zihan
+import qdol_phase ###Zihan
 
 from jax.config import config
 config.update("jax_enable_x64", True)

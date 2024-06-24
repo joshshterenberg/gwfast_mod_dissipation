@@ -558,7 +558,7 @@ class GWSignal(object):
             
         ### Zihan: add dissipation and other finite size effects here
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.Lam12_from_Lamt_delLam(H0Tilde, deltaH0, etaUse) ###JS_EDIT: for now using the same function just for fun.
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, etaUse) ###JS_EDIT: for now using the same function just for fun.
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
         
@@ -882,10 +882,10 @@ class GWSignal(object):
                 H1s0wE, H2s0wE = evParams['H1s0wE'].astype('complex128'), evParams['H2s0wE'].astype('complex128')
             except KeyError:
                 try:
-                    H1s0wE, H2s0wE  = utils.Lam12_from_Lamt_delLam(evParams['H0Tilde'].astype('complex128'), evParams['deltaH0'].astype('complex128'), etaOr) ###JS_EDIT: likewise, might need to change
+                    H1s0wE, H2s0wE  = utils.H012_from_H0t_delH0(evParams['H0Tilde'].astype('complex128'), evParams['deltaH0'].astype('complex128'), etaOr) ###JS_EDIT: likewise, might need to change
                 except KeyError:
                     raise ValueError('Two among H1s0wE, H2s0wE and H0Tilde and deltaH0 have to be provided.')
-            H0Tilde, deltaH0 = utils.Lamt_delLam_from_Lam12(H1s0wE, H2s0wE, etaOr)
+            H0Tilde, deltaH0 = utils.H0t_delH0_from_H012(H1s0wE, H2s0wE, etaOr)
             
         else:
             H1s0wE, H2s0wE, H0Tilde, deltaH0 = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
@@ -1141,7 +1141,7 @@ class GWSignal(object):
         ## Here begins the computation using the autodiff method: Zihan: Dissipation added
         
             if self.wf_model.is_holomorphic:
-                GWstrainUse = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0: self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H1s0wE, H2s0wE, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang)
+                GWstrainUse = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0: self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang)
                 
                 FisherDerivs = np.asarray(vmap(jacrev(GWstrainUse, argnums=derivargs, holomorphic=True))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc,H0Tilde, deltaH0))
             else:
@@ -1262,7 +1262,7 @@ class GWSignal(object):
             else:
                 NAnalyticalDerivs = 6
                 
-            dL_deriv, theta_deriv, phi_deriv, iota_deriv, psi_deriv, tc_deriv, Phicoal_deriv = self._AnalyticalDerivatives(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H1s0wE, H2s0wE, rot=rot, use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang)
+            dL_deriv, theta_deriv, phi_deriv, iota_deriv, psi_deriv, tc_deriv, Phicoal_deriv = self._AnalyticalDerivatives(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang)
             if (not self.wf_model.is_HigherModes) and (not self.wf_model.is_Precessing):
                 if not self.wf_model.is_newtonian:
                     tmpsplit1, tmpsplit2, _ = onp.vsplit(FisherDerivs, onp.array([inputNumdL, nParams-NAnalyticalDerivs]))
@@ -1277,7 +1277,7 @@ class GWSignal(object):
         
         return FisherDerivs
         
-    def _AnalyticalDerivatives(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H1s0wE, H2s0wE, rot=0., use_m1m2=False, use_chi1chi2=False, use_prec_ang=False):
+    def _AnalyticalDerivatives(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., use_m1m2=False, use_chi1chi2=False, use_prec_ang=False):
         """
         Compute analytical derivatives with respect to ``dL``, ``theta``, ``phi``, ``psi``, ``tcoal``, ``Phicoal`` and ``iota`` (the latter only for the fundamental mode in the non-precessing case).
         
@@ -1350,7 +1350,7 @@ class GWSignal(object):
             
         ### Zihan: add dissipation here:
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.Lam12_from_Lamt_delLam(H0Tilde, deltaH0, etaUse)
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, etaUse) ###JS_EDIT
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
         ###
