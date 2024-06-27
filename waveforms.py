@@ -27,8 +27,8 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(SCRIPT_DIR)
 
 
-from gwfast import gwfastGlobals as glob
-from gwfast import gwfastUtils as utils
+import gwfastGlobals as glob
+import gwfastUtils as utils
 
 try:
     import lal

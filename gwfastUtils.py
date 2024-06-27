@@ -13,7 +13,7 @@ import jax.numpy as jnp
 import json
 import h5py
 
-from gwfast import gwfastGlobals as glob
+import gwfastGlobals as glob
 
 ##############################################################################
 # LOADING AND SAVING CATALOGS
