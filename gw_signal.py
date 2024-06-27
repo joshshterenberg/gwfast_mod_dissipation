@@ -558,7 +558,7 @@ class GWSignal(object):
             
         ### Zihan: add dissipation and other finite size effects here
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, etaUse) ###JS_EDIT: for now using the same function just for fun.
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, Mc, etaUse) ###JS_EDIT: for now using the same function just for fun.
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
         
@@ -882,10 +882,10 @@ class GWSignal(object):
                 H1s0wE, H2s0wE = evParams['H1s0wE'].astype('complex128'), evParams['H2s0wE'].astype('complex128')
             except KeyError:
                 try:
-                    H1s0wE, H2s0wE  = utils.H012_from_H0t_delH0(evParams['H0Tilde'].astype('complex128'), evParams['deltaH0'].astype('complex128'), etaOr) ###JS_EDIT: likewise, might need to change
+                    H1s0wE, H2s0wE  = utils.H012_from_H0t_delH0(evParams['H0Tilde'].astype('complex128'), evParams['deltaH0'].astype('complex128'), Mc, etaOr) ###JS_EDIT: likewise, might need to change
                 except KeyError:
                     raise ValueError('Two among H1s0wE, H2s0wE and H0Tilde and deltaH0 have to be provided.')
-            H0Tilde, deltaH0 = utils.H0t_delH0_from_H012(H1s0wE, H2s0wE, etaOr)
+            H0Tilde, deltaH0 = utils.H0t_delH0_from_H012(H1s0wE, H2s0wE, Mc, etaOr)
             
         else:
             H1s0wE, H2s0wE, H0Tilde, deltaH0 = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
@@ -1350,7 +1350,7 @@ class GWSignal(object):
             
         ### Zihan: add dissipation here:
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, etaUse) ###JS_EDIT
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, Mc, etaUse) ###JS_EDIT
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
         ###

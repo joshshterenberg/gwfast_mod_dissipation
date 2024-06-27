@@ -441,11 +441,11 @@ def Lam12_from_Lamt_delLam(Lamt, delLam, eta):
     
     return Lambda1, Lambda2
 
-def H012_from_H0t_delH0(H0t, delH0, eta):
+def H012_from_H0t_delH0(H0t, delH0, Mc, eta):
     m1, m2 = m1m2_from_Mceta(Mc, eta)
     return ((m1_m2)**4 / (2 * m1**4)) * (H0t + delH0), ((m1_m2)**4 / (2 * m2**4)) * (H0t - delH0)
 
-def H0t_delH0_from_H012(H1s0wE, H2s02E, eta):
+def H0t_delH0_from_H012(H1s0wE, H2s02E, Mc, eta):
     m1, m2 = m1m2_from_Mceta(Mc, eta)
     return (m1**4 / (m1+m2)**4)*H1s0wE + (m2**4 / (m1+m2)**4)*H2s0wE, (m1**4 / (m1+m2)**4)*H1s0wE - (m2**4 / (m1+m2)**4)*H2s0wE
     
