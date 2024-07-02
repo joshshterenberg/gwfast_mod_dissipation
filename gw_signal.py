@@ -484,7 +484,7 @@ class GWSignal(object):
 
         return 2.*np.pi*f*(tcoal*3600.*24.) - Phicoal - PhiGw
 
-    def GWstrain(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H1s0wE, H2s0wE, rot=0., is_m1m2=False, is_chi1chi2=False, is_prec_ang=False, return_single_comp=None):
+    def GWstrain(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., is_m1m2=False, is_chi1chi2=False, is_prec_ang=False, return_single_comp=None):
         """
         Compute the full GW strain (complex) as a function of the parameters, at given frequencies.
         
@@ -558,7 +558,7 @@ class GWSignal(object):
             
         ### Zihan: add dissipation and other finite size effects here
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, Mc, etaUse) ###JS_EDIT: for now using the same function just for fun.
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, McUse, etaUse) ###JS_EDIT: for now using the same function just for fun.
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
         

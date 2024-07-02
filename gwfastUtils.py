@@ -443,9 +443,9 @@ def Lam12_from_Lamt_delLam(Lamt, delLam, eta):
 
 def H012_from_H0t_delH0(H0t, delH0, Mc, eta):
     m1, m2 = m1m2_from_Mceta(Mc, eta)
-    return ((m1_m2)**4 / (2 * m1**4)) * (H0t + delH0), ((m1_m2)**4 / (2 * m2**4)) * (H0t - delH0)
+    return ((m1+m2)**4 / (2 * m1**4)) * (H0t + delH0), ((m1+m2)**4 / (2 * m2**4)) * (H0t - delH0)
 
-def H0t_delH0_from_H012(H1s0wE, H2s02E, Mc, eta):
+def H0t_delH0_from_H012(H1s0wE, H2s0wE, Mc, eta):
     m1, m2 = m1m2_from_Mceta(Mc, eta)
     return (m1**4 / (m1+m2)**4)*H1s0wE + (m2**4 / (m1+m2)**4)*H2s0wE, (m1**4 / (m1+m2)**4)*H1s0wE - (m2**4 / (m1+m2)**4)*H2s0wE
     
@@ -464,7 +464,7 @@ def m1m2_from_Mceta(Mc, eta):
     :rtype: tuple(array, array) or tuple(float, float)
     
     """
-    Seta = np.sqrt(np.where(eta<0.25, 1.0 - 4.0*eta, 0.))
+    Seta = jnp.sqrt(jnp.where(eta<0.25, 1.0 - 4.0*eta, 0.))
     m1 = 0.5*(Mc/(eta**(3./5.)))*(1. + Seta)
     m2 = 0.5*(Mc/(eta**(3./5.)))*(1. - Seta)
 
