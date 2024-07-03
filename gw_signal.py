@@ -192,6 +192,10 @@ class GWSignal(object):
                            'Lambda2':np.array([300.]),
                            'H1s0wE':np.array([300.]),
                            'H2s0wE':np.array([300.]),
+                           'H1s3E':np.array([300.]), ###JS_EDIT: next 4 lines
+                           'H2s3E':np.array([300.]),
+                           'H1s3B':np.array([300.]),
+                           'H2s3B':np.array([300.]),
                            #'snr': np.array([21.20295982]),
                            #'tGPS': np.array([1.78168705e+09]),
                            'tcoal': np.array([0.]),
@@ -484,7 +488,7 @@ class GWSignal(object):
 
         return 2.*np.pi*f*(tcoal*3600.*24.) - Phicoal - PhiGw
 
-    def GWstrain(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., is_m1m2=False, is_chi1chi2=False, is_prec_ang=False, return_single_comp=None):
+    def GWstrain(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=0., is_m1m2=False, is_chi1chi2=False, is_prec_ang=False, return_single_comp=None): ###JS_EDIT: copy for H0s3E/B
         """
         Compute the full GW strain (complex) as a function of the parameters, at given frequencies.
         
@@ -558,9 +562,18 @@ class GWSignal(object):
             
         ### Zihan: add dissipation and other finite size effects here
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, McUse, etaUse) ###JS_EDIT: for now using the same function just for fun.
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, McUse, etaUse) 
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
+
+            ###JS_EDIT: repeat for spin_3 part, assuming same ~ and delta relationship
+            H1s3E, H2s3E = utils.H012_from_H0t_delH0(H0s3ETilde, deltaH0s3E, McUse, etaUse) 
+            H1s3B, H2s3B = utils.H012_from_H0t_delH0(H0s3BTilde, deltaH0s3B, McUse, etaUse) 
+            evParams['H1s3E'] = H1s3E
+            evParams['H2s3E'] = H2s3E
+            evParams['H1s3B'] = H1s3B
+            evParams['H2s3B'] = H2s3B
+            
         
             
         if self.wf_model.is_eccentric:
@@ -877,18 +890,40 @@ class GWSignal(object):
             Lambda1, Lambda2, LambdaTilde, deltaLambda = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
 
         ### Zihan: add dissipation parameter here: modify this part to an analog with line 868-879   
+        ###JS_EDIT: copy for H0s3E/B
         if self.wf_model.is_s0Diss:
             try:
-                H1s0wE, H2s0wE = evParams['H1s0wE'].astype('complex128'), evParams['H2s0wE'].astype('complex128')
+                H1s0wE, H2s0wE = evParams['H1s0wE'].astype('complex128'),evParams['H2s0wE'].astype('complex128')
             except KeyError:
                 try:
                     H1s0wE, H2s0wE  = utils.H012_from_H0t_delH0(evParams['H0Tilde'].astype('complex128'), evParams['deltaH0'].astype('complex128'), Mc, etaOr) ###JS_EDIT: likewise, might need to change
                 except KeyError:
                     raise ValueError('Two among H1s0wE, H2s0wE and H0Tilde and deltaH0 have to be provided.')
+            ###JS_EDIT: adding spin-3 versions
+            try:
+                H1s3E, H2s3E = evParams['H1s3E'].astype('complex128'), evParams['H2s3E'].astype('complex128')
+            except KeyError:
+                try:
+                    H1s3E, H2s3E  = utils.H012_from_H0t_delH0(evParams['H0s3ETilde'].astype('complex128'), evParams['deltaH0s3E'].astype('complex128'), Mc, etaOr)
+                except KeyError:
+                    raise ValueError('Two among H1s3E, H2s3E and H0s3ETilde and deltaH0s3E have to be provided.')
+            try:
+                H1s3B, H2s3B = evParams['H1s3B'].astype('complex128'), evParams['H2s3B'].astype('complex128')
+            except KeyError:
+                try:
+                    H1s3B, H2s3B  = utils.H012_from_H0t_delH0(evParams['H0s3BTilde'].astype('complex128'), evParams['deltaH0s3B'].astype('complex128'), Mc, etaOr)
+                except KeyError:
+                    raise ValueError('Two among H1s3B, H2s3B and H0s3BTilde and deltaH0s3B have to be provided.')
+
+            
             H0Tilde, deltaH0 = utils.H0t_delH0_from_H012(H1s0wE, H2s0wE, Mc, etaOr)
+            H0s3ETilde, deltaH0s3E = utils.H0t_delH0_from_H012(H1s3E, H2s3E, Mc, etaOr)
+            H0s3BTilde, deltaH0s3B = utils.H0t_delH0_from_H012(H1s3B, H2s3B, Mc, etaOr)
             
         else:
             H1s0wE, H2s0wE, H0Tilde, deltaH0 = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
+            H1s3E, H2s3E, H0s3ETilde, deltaH0s3E = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
+            H1s3B, H2s3B, H0s3BTilde, deltaH0s3B = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
         ###
 
         
@@ -934,7 +969,7 @@ class GWSignal(object):
         
         if self.detector_shape=='L': 
             # Compute derivatives ### Zihan: change the name of variables to H0Tilde and deltaH0 and functions below. 
-            FisherDerivs = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
+            FisherDerivs = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=0., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
             # Change the units of the tcoal derivative from days to seconds (this improves conditioning)
             FisherDerivs = onp.array(FisherDerivs)
             FisherDerivs[tcelem,:,:] /= (3600.*24.)
@@ -958,7 +993,7 @@ class GWSignal(object):
             if not self.compute2arms:
                 for i in range(3):
                     # Change rot and compute derivatives
-                    FisherDerivs = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc,H0Tilde, deltaH0,rot=i*60., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
+                    FisherDerivs = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc,H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=i*60., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
                     # Change the units of the tcoal derivative from days to seconds (this improves conditioning)
                     FisherDerivs = onp.array(FisherDerivs)
                     FisherDerivs[tcelem,:,:] /= (3600.*24.)
@@ -984,7 +1019,7 @@ class GWSignal(object):
             # The signal in 3 arms sums to zero for geometrical reasons, so we can use this to skip some calculations
             
                 # Compute derivatives
-                FisherDerivs1 = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
+                FisherDerivs1 = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=0., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
                 # Change the units of the tcoal derivative from days to seconds (this improves conditioning)
                 FisherDerivs1 = onp.array(FisherDerivs1)
                 FisherDerivs1[tcelem,:,:] /= (3600.*24.)
@@ -1008,7 +1043,7 @@ class GWSignal(object):
                 allFishers.append(tmpFisher)
                 
                 
-                FisherDerivs2 = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=60., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
+                FisherDerivs2 = self._SignalDerivatives_use(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=60., use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang, computeAnalyticalDeriv=computeAnalyticalDeriv, computeDerivFinDiff=computeDerivFinDiff, **kwargs)
                 FisherDerivs2 = onp.array(FisherDerivs2)
                 FisherDerivs2[tcelem,:,:] /= (3600.*24.)
                 FisherIntegrands = (onp.conjugate(FisherDerivs2[:,:,onp.newaxis,:])*FisherDerivs2.transpose(1,0,2))
@@ -1058,7 +1093,7 @@ class GWSignal(object):
     
     
     
-    def _SignalDerivatives(self, fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., use_m1m2=False, use_chi1chi2=True, use_prec_ang=True, computeDerivFinDiff=False, computeAnalyticalDeriv=True, stepNDT=MaxStepGenerator(base_step=1e-5), methodNDT='central', **kwargs):
+    def _SignalDerivatives(self, fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=0., use_m1m2=False, use_chi1chi2=True, use_prec_ang=True, computeDerivFinDiff=False, computeAnalyticalDeriv=True, stepNDT=MaxStepGenerator(base_step=1e-5), methodNDT='central', **kwargs):
         """
         Compute the derivatives of the GW strain with respect to the parameters of the event(s) at given frequencies (in :math:`\\rm Hz`).
         
@@ -1141,18 +1176,18 @@ class GWSignal(object):
         ## Here begins the computation using the autodiff method: Zihan: Dissipation added
         
             if self.wf_model.is_holomorphic:
-                GWstrainUse = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0: self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang)
+                GWstrainUse = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B,: self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang)
                 
-                FisherDerivs = np.asarray(vmap(jacrev(GWstrainUse, argnums=derivargs, holomorphic=True))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc,H0Tilde, deltaH0))
+                FisherDerivs = np.asarray(vmap(jacrev(GWstrainUse, argnums=derivargs, holomorphic=True))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc,H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B))
             else:
                 # In the non holomorphic case, to improve the accuracy, we compute separately the derivatives of the real and imaginary part of the strain as real functions
-                fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0 = np.real(fgrids), np.real(Mc), np.real(eta), np.real(dL), np.real(theta), np.real(phi), np.real(iota), np.real(psi), np.real(tcoal), np.real(Phicoal), np.real(chiS), np.real(chiA), np.real(chi1x), np.real(chi2x), np.real(chi1y), np.real(chi2y), np.real(LambdaTilde), np.real(deltaLambda), np.real(ecc), np.real(H0Tilde), np.real(deltaH0)
+                fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, = np.real(fgrids), np.real(Mc), np.real(eta), np.real(dL), np.real(theta), np.real(phi), np.real(iota), np.real(psi), np.real(tcoal), np.real(Phicoal), np.real(chiS), np.real(chiA), np.real(chi1x), np.real(chi2x), np.real(chi1y), np.real(chi2y), np.real(LambdaTilde), np.real(deltaLambda), np.real(ecc), np.real(H0Tilde), np.real(deltaH0), np.real(H0s3ETilde), np.real(deltaH0s3E), np.real(H0s3BTilde), np.real(deltaH0s3B)
                 
-                GWstrainUse_real = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0: np.real(self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang))
-                GWstrainUse_imag = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0: np.imag(self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang))
+                GWstrainUse_real = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B: np.real(self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang))
+                GWstrainUse_imag = lambda f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B: np.imag(self.GWstrain(f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2, is_prec_ang=use_prec_ang))
                 
-                realDerivs = np.asarray(vmap(jacrev(GWstrainUse_real, argnums=derivargs))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0))
-                imagDerivs = np.asarray(vmap(jacrev(GWstrainUse_imag, argnums=derivargs))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0))
+                realDerivs = np.asarray(vmap(jacrev(GWstrainUse_real, argnums=derivargs))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B))
+                imagDerivs = np.asarray(vmap(jacrev(GWstrainUse_imag, argnums=derivargs))(fgrids.T, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B))
             
                 FisherDerivs = realDerivs + 1j*imagDerivs
         
@@ -1162,10 +1197,10 @@ class GWSignal(object):
         else:
             if self.wf_model.is_newtonian:
                 if computeAnalyticalDeriv:
-                    GWstrainUse = lambda pars: self.GWstrain(fgrids, pars[0], eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2)
+                    GWstrainUse = lambda pars: self.GWstrain(fgrids, pars[0], eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2)
                     evpars = [Mc]
                 else:
-                    GWstrainUse = lambda pars: self.GWstrain(fgrids, pars[0], eta, pars[1], pars[2], pars[3], pars[4], pars[5], pars[6], pars[7], chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2)
+                    GWstrainUse = lambda pars: self.GWstrain(fgrids, pars[0], eta, pars[1], pars[2], pars[3], pars[4], pars[5], pars[6], pars[7], chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=rot, is_m1m2=use_m1m2, is_chi1chi2=use_chi1chi2)
                     evpars = [Mc, dL, theta, phi, iota, psi, tcoal, Phicoal]
             elif self.wf_model.is_tidal:
                 if self.wf_model.is_Precessing:
@@ -1262,7 +1297,7 @@ class GWSignal(object):
             else:
                 NAnalyticalDerivs = 6
                 
-            dL_deriv, theta_deriv, phi_deriv, iota_deriv, psi_deriv, tc_deriv, Phicoal_deriv = self._AnalyticalDerivatives(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=rot, use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang)
+            dL_deriv, theta_deriv, phi_deriv, iota_deriv, psi_deriv, tc_deriv, Phicoal_deriv = self._AnalyticalDerivatives(fgrids, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=rot, use_m1m2=use_m1m2, use_chi1chi2=use_chi1chi2, use_prec_ang=use_prec_ang)
             if (not self.wf_model.is_HigherModes) and (not self.wf_model.is_Precessing):
                 if not self.wf_model.is_newtonian:
                     tmpsplit1, tmpsplit2, _ = onp.vsplit(FisherDerivs, onp.array([inputNumdL, nParams-NAnalyticalDerivs]))
@@ -1277,7 +1312,7 @@ class GWSignal(object):
         
         return FisherDerivs
         
-    def _AnalyticalDerivatives(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, rot=0., use_m1m2=False, use_chi1chi2=False, use_prec_ang=False):
+    def _AnalyticalDerivatives(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=0., use_m1m2=False, use_chi1chi2=False, use_prec_ang=False):
         """
         Compute analytical derivatives with respect to ``dL``, ``theta``, ``phi``, ``psi``, ``tcoal``, ``Phicoal`` and ``iota`` (the latter only for the fundamental mode in the non-precessing case).
         
@@ -1350,9 +1385,15 @@ class GWSignal(object):
             
         ### Zihan: add dissipation here:
         if self.wf_model.is_s0Diss:
-            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, Mc, etaUse) ###JS_EDIT
+            H1s0wE, H2s0wE = utils.H012_from_H0t_delH0(H0Tilde, deltaH0, Mc, etaUse)
             evParams['H1s0wE'] = H1s0wE
             evParams['H2s0wE'] = H2s0wE
+            H1s3E, H2s3E = utils.H012_from_H0t_delH0(H0s3ETilde, deltaH0s3E, Mc, etaUse) ###JS_EDIT
+            H1s3B, H2s3B = utils.H012_from_H0t_delH0(H0s3BTilde, deltaH0s3B, Mc, etaUse)
+            evParams['H1s3E'] = H1s3E
+            evParams['H2s3E'] = H2s3E
+            evParams['H1s3B'] = H1s3B
+            evParams['H2s3B'] = H2s3B
         ###
         
         if (not self.wf_model.is_HigherModes) and (not self.wf_model.is_Precessing):

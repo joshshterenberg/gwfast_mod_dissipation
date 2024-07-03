@@ -147,7 +147,7 @@ class WaveFormModel(ABC):
             self.ParNums.pop('iota')
             
         if (is_tidal) and (is_s0Diss) and (not is_Precessing) and (not is_eccentric):
-            self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H0Tilde':13, 'deltaH0':14}
+            self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H0Tilde':13, 'deltaH0':14, 'H0s3ETilde':15,'deltaH0s3E':16,'H0s3BTilde':17,'deltaH0s3B':18}
             self.nParams = 15
         ## End of including finite size
         
@@ -3586,10 +3586,10 @@ class IMRPhenomD_Diss(WaveFormModel):
         kappa2 = 0
         lambda1 = 0
         lambda2 = 0
-        H1s3E = 0
-        H2s3E = 0
-        H1s3B = 0
-        H2s3B = 0
+        H1s3E = kwargs['H1s3E'] #0 ###JS_EDIT: next 4 lines
+        H2s3E = kwargs['H2s3E'] #0
+        H1s3B = kwargs['H1s3B'] #0
+        H2s3B = kwargs['H2s3B'] #0
         l1 = kwargs['Lambda1']
         l2 = kwargs['Lambda2']
         ##
