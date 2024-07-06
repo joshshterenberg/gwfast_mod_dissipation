@@ -148,7 +148,7 @@ class WaveFormModel(ABC):
             
         if (is_tidal) and (is_s0Diss) and (not is_Precessing) and (not is_eccentric):
             self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H0Tilde':13, 'deltaH0':14, 'H0s3ETilde':15,'deltaH0s3E':16,'H0s3BTilde':17,'deltaH0s3B':18}
-            self.nParams = 15
+            self.nParams = 19 ###JS_EDIT: i'm an idiot.
         ## End of including finite size
         
         self.ParNums = dict(sorted(self.ParNums.items(), key=lambda item: item[1]))
@@ -3593,7 +3593,6 @@ class IMRPhenomD_Diss(WaveFormModel):
         l1 = kwargs['Lambda1']
         l2 = kwargs['Lambda2']
         ##
-
 
         theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2)
         Phi_TDN = qdol_phase.gen_h0_qdol_phase(f, theta_more, fRef_Diss, alpha=0.35, fix_bh_superradiance=False, EBdual=True) ##assuming ref frequency is the same.

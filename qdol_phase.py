@@ -376,7 +376,8 @@ def gen_h0_qdol_phase(f, theta_more, f_ref, alpha=1.0,fix_bh_superradiance=True,
     """
     # theta_more ordering: Mc, eta, chi_1, chi_2, kappa1, kappa2, h1s1_E, h2s1_E, h1s1_B, h2s1_B, lambda1, lambda2, \
     #h1s3_E, h2s3_E, h1s3_B, h2s3_B, h1s0,h2s0, l1, l2
-    Mc, eta, chi_1, chi_2, _, _, _, _, _, _, _, _, _, _, _, _, _, _, l1,l2 = theta_more
+    Mc, eta, chi_1, chi_2, kappa1, kappa2, h1s1_E, h2s1_E, h1s1_B, h2s1_B, lambda1, lambda2, h1s3_E, h2s3_E, h1s3_B, h2s3_B, h1s0,h2s0, l1, l2 = theta_more
+    
     M = Mc / (eta ** (3 / 5))
     pre = 3.6686934875530996e-19  # (GN*Msun/c^3)^(5/6)/Hz^(7/6)*c/Mpc/sec
     chi_s = 0.5 * (chi_1 + chi_2)

@@ -574,7 +574,6 @@ class GWSignal(object):
             evParams['H1s3B'] = H1s3B
             evParams['H2s3B'] = H2s3B
             
-        
             
         if self.wf_model.is_eccentric:
             evParams['ecc'] = ecc
@@ -925,7 +924,7 @@ class GWSignal(object):
             H1s3E, H2s3E, H0s3ETilde, deltaH0s3E = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
             H1s3B, H2s3B, H0s3BTilde, deltaH0s3B = np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape), np.zeros(Mc.shape)
         ###
-
+        
         
         if self.wf_model.is_eccentric:
             try:
@@ -1165,8 +1164,8 @@ class GWSignal(object):
         if self.wf_model.is_eccentric:
             derivargs = derivargs + (18,)
             
-        if self.wf_model.is_s0Diss:
-            derivargs = derivargs + (19,20,)
+        if self.wf_model.is_s0Diss: ###JS_EDIT: modify dissipation for further args: H0s3E/B.
+            derivargs = derivargs + (19,20,21,22,23,24,) ###was (19,20)
         ###
         
         nParams = self.wf_model.nParams
@@ -1309,7 +1308,6 @@ class GWSignal(object):
                 FisherDerivs = np.vstack((tmpsplit1, np.asarray(dL_deriv).T[np.newaxis,:], np.asarray(theta_deriv).T[np.newaxis,:], np.asarray(phi_deriv).T[np.newaxis,:], tmpsplit2, np.asarray(psi_deriv).T[np.newaxis,:], np.asarray(tc_deriv).T[np.newaxis,:], np.asarray(Phicoal_deriv).T[np.newaxis,:], tmpsplit3))
                 
         ## End of analytic derivative computation
-        
         return FisherDerivs
         
     def _AnalyticalDerivatives(self, f, Mc, eta, dL, theta, phi, iota, psi, tcoal, Phicoal, chiS, chiA, chi1x, chi2x, chi1y, chi2y, LambdaTilde, deltaLambda, ecc, H0Tilde, deltaH0, H0s3ETilde, deltaH0s3E, H0s3BTilde, deltaH0s3B, rot=0., use_m1m2=False, use_chi1chi2=False, use_prec_ang=False):
