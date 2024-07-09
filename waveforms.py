@@ -147,8 +147,8 @@ class WaveFormModel(ABC):
             self.ParNums.pop('iota')
             
         if (is_tidal) and (is_s0Diss) and (not is_Precessing) and (not is_eccentric):
-            self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H0Tilde':13, 'deltaH0':14, 'H0s3ETilde':15,'deltaH0s3E':16,'H0s3BTilde':17,'deltaH0s3B':18}
-            self.nParams = 19 ###JS_EDIT: i'm an idiot.
+            self.ParNums = {'Mc':0, 'eta':1, 'dL':2, 'theta':3, 'phi':4, 'iota':5, 'psi':6, 'tcoal':7, 'Phicoal':8, 'chi1z':9,  'chi2z':10, 'LambdaTilde':11, 'deltaLambda':12,'H0Tilde':13, 'deltaH0':14, 'H0s1ETilde':15,'deltaH0s1E':16,'H0s1BTilde':17,'deltaH0s1B':18,'H0s3ETilde':19,'deltaH0s3E':20,'H0s3BTilde':21,'deltaH0s3B':22,'kappaTilde':23,'deltakappa':24,'lambdaTilde':25,'deltalambda':26}
+            self.nParams = 27 ###JS_EDIT: i'm an idiot.
         ## End of including finite size
         
         self.ParNums = dict(sorted(self.ParNums.items(), key=lambda item: item[1]))
@@ -3574,18 +3574,18 @@ class IMRPhenomD_Diss(WaveFormModel):
             
         ### Zihan: Add time dissipation phase here: 
         ## (Kerr) tidal dissipation numbers here
-        H1s1E = -(8./45.)*(1+3*chi12)
-        H1s1B = -(8./45.)*(1+3*chi12)
-        H2s1E = -(8./45.)*(1+3*chi22)
-        H2s1B = -(8./45.)*(1+3*chi22)
+        H1s1E = kwargs['H1s1E'] #-(8./45.)*(1+3*chi12) ###JS_EDIT: next 4 lines
+        H2s1E = kwargs['H2s1E'] #-(8./45.)*(1+3*chi12)
+        H1s1B = kwargs['H1s1B'] #-(8./45.)*(1+3*chi22)
+        H2s1B = kwargs['H2s1B'] #-(8./45.)*(1+3*chi22)
         
         H1s0wE = kwargs['H1s0wE']
         H2s0wE = kwargs['H2s0wE']
 
-        kappa1 = 0
-        kappa2 = 0
-        lambda1 = 0
-        lambda2 = 0
+        kappa1 = kwargs['kappa1']
+        kappa2 = kwargs['kappa2']
+        lambda1 = kwargs['lambda1']
+        lambda2 = kwargs['lambda2']
         H1s3E = kwargs['H1s3E'] #0 ###JS_EDIT: next 4 lines
         H2s3E = kwargs['H2s3E'] #0
         H1s3B = kwargs['H1s3B'] #0
@@ -3595,7 +3595,7 @@ class IMRPhenomD_Diss(WaveFormModel):
         ##
 
         theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2)
-        Phi_TDN = qdol_phase.gen_h0_qdol_phase(f, theta_more, fRef_Diss, alpha=0.35, fix_bh_superradiance=False, EBdual=True) ##assuming ref frequency is the same.
+        Phi_TDN = qdol_phase.gen_h0_qdol_phase(f, theta_more, fRef_Diss, alpha=0.35, fix_bh_superradiance=False, EBdual=False) ##assuming ref frequency is the same.
 
         
         #for freq in range(len(fgrid)):

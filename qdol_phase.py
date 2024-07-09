@@ -136,7 +136,6 @@ def phase_qdol(f, theta, fix_bh_superradiance, EBdual):
     hs3_B = (h1s3_B*m1**3 + h2s3_B*m2**3) / M**3
     ha3_B = (h1s3_B*m1**3 - h2s3_B*m2**3) / M**3
 
-    print(hs3_B) ###JS_EDIT: delete
     
     
     # 4PN Dissipation (LO non-spinning) 

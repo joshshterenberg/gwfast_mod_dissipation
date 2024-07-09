@@ -448,7 +448,23 @@ def H012_from_H0t_delH0(H0t, delH0, Mc, eta):
 def H0t_delH0_from_H012(H1s0wE, H2s0wE, Mc, eta):
     m1, m2 = m1m2_from_Mceta(Mc, eta)
     return (m1**4 / (m1+m2)**4)*H1s0wE + (m2**4 / (m1+m2)**4)*H2s0wE, (m1**4 / (m1+m2)**4)*H1s0wE - (m2**4 / (m1+m2)**4)*H2s0wE
-    
+
+
+
+def H112_from_H0t_delH0(H0t, delH0, Mc, eta):
+    m1, m2 = m1m2_from_Mceta(Mc, eta)
+    return ((m1+m2)**3 / (2 * m1**3)) * (H0t + delH0), ((m1+m2)**3 / (2 * m2**3)) * (H0t - delH0)
+
+def H1t_delH0_from_H012(H1s0wE, H2s0wE, Mc, eta):
+    m1, m2 = m1m2_from_Mceta(Mc, eta)
+    return (m1**3 / (m1+m2)**3)*H1s0wE + (m2**3 / (m1+m2)**3)*H2s0wE, (m1**3 / (m1+m2)**3)*H1s0wE - (m2**3 / (m1+m2)**3)*H2s0wE
+
+
+def pairtosym(a,b):
+    return (a+b)/2, (a-b)/2
+
+def symtopair(a,b):
+    return a+b, a-b
 
 ##############################################################################
 # MASSES
