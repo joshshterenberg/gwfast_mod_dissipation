@@ -8,6 +8,7 @@ import plotting
 _LABELS = {
     # Mass
     'mchirp': r'$\mathcal{M}^{\rm det}$',
+    'Mc':r'$\mathcal{M}^{\rm det}$',
     'lnq': r'$\ln q$',
     'q': r'$q$',
     'eta': r'$\eta$',
@@ -48,11 +49,15 @@ _LABELS = {
     's1phi': r'$\phi_{s1}$',
     's2phi': r'$\phi_{s2}$',
     'chip': r'$\chi_p$',
+    'chi1z': r'$\chi_{1z}$',
+    'chi2z': r'$\chi_{2z}$',
     # Distance
     'd_hat': r'$\hat{d}$',
     'd_luminosity': r'$d_L$',
+    'dL': r'$d_L$',
     'z': r'$z$',
     # Orientation
+    'phi': r'$\phi$',
     'phi_linfree': r'$\phi_{\rm LF}$',
     'phi_ref': r'$\phi_{\rm ref}$',
     'phi_ref_hat': r'$\hat{\phi}_{\rm ref}$',
@@ -65,6 +70,8 @@ _LABELS = {
     'phi_jl': r'$\phi_{JL}$',
     'phi_jl_hat': r'$\hat\phi_{JL}$',
     'phi12': r'$\phi_{12}$',
+    'theta': r'$\theta$',
+    'Phicoal': r'$\Phi_{\rm coal}$',
     # Location
     'costhetanet': r'$\cos \theta_{\rm net}$',
     'phinet_hat': r'$\hat{\phi}_{\rm net}$',
@@ -75,6 +82,7 @@ _LABELS = {
     # Time
     't_refdet': r'$t_{\rm ref\,det}$',
     'tc': r'$t_c$',
+    'tcoal': r'$t_{\rm coal}$',
     't_geocenter': r'$t_{\rm ⴲ}$',
     't_linfree': r'$t_{\rm LF}$',
     # Likelihood
@@ -108,6 +116,11 @@ _LABELS = {
     'ha_E': r'$\mathcal{H}_{a}^E$',
     'hs_B': r'$\mathcal{H}_{s}^B$',
     'ha_B': r'$\mathcal{H}_{a}^B$',
+    'H0Tilde': r'$\mathcal{H}_0$',
+    'deltaH0': r'$\delta \mathcal{H}_0$',
+    # Love:
+    'LambdaTilde': r'$\tilde{\Lambda}$',
+    'deltaLambda': r'$\delta \Lambda$',
     }
 
 _UNITS = (dict.fromkeys(['mchirp', 'm1', 'm2', 'mtot', 'mtot_source',

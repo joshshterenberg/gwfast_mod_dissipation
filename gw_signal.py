@@ -669,8 +669,11 @@ class GWSignal(object):
                     return hp + hc
             else:
                 Ap, Ac = self.GWAmplitudes(evParams, f, rot=rot)
+                ### Zihan: add wfAmpl here to perform the marginalization over sky location and inclination angle
+                wfAmpl = self.wf_model.Ampl(f, **evParams)
                 Psi = self.GWPhase(evParams, f)
-                Psi = Psi + phiD + phiL
+                ### Zihan: no need to include the contribution from phiD and phiL
+                #Psi = Psi + phiD + phiL
             
                 if return_single_comp is not None:
                     if (return_single_comp == 'Ap'):
@@ -688,7 +691,9 @@ class GWSignal(object):
                     else:
                         raise ValueError('Single component to return has to be among Ap, Ac, Psip, Psic')
                 else:
-                    return (Ap + 1j*Ac)*np.exp(Psi*1j)
+                    ### Zihan: marginalize over sky location and inclination angle
+                    #return (Ap + 1j*Ac)*np.exp(Psi*1j)
+                    return 2.0/5.0 * wfAmpl * np.exp(Psi*1j)
                 #return np.sqrt(Ap*Ap + Ac*Ac)*np.exp((Psi+phiP)*1j)
         
     
