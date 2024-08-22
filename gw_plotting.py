@@ -117,8 +117,13 @@ _LABELS = {
     'hs_B': r'$\mathcal{H}_{s}^B$',
     'ha_B': r'$\mathcal{H}_{a}^B$',
     'H0Tilde': r'$\mathcal{H}_0$',
-    'deltaH0': r'$\delta \mathcal{H}_0$',
+    'deltaH0': r'$\delta \mathcal{H}_0$', 
+    'H0s1ETilde':r'$\mathcal{H}_1^{E}$', ###JS_EDIT
+    'kappaTilde':r'$\tilde{\kappa}$',
+    'lambdaTilde':r'$\tilde{\Lambda}$',
+    'H0s3ETilde':r'$\mathcal{H}_{3}^{E}$',
     # Love:
+    'Lambdat':r'$\tilde{\lambda}$',
     'LambdaTilde': r'$\tilde{\Lambda}$',
     'deltaLambda': r'$\delta \Lambda$',
     }

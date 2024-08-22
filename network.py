@@ -71,7 +71,6 @@ class DetNet(object):
                    snrs[d+'_%s'%i] = snr_[i]
             else:
                 snrs[d] = snr_
-        
         net_snr = onp.sqrt(onp.array([ snrs[k]**2 for k in snrs.keys() ]).sum(axis=0))
         if return_all:
             snrs['net'] = net_snr

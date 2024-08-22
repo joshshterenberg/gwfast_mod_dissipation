@@ -792,7 +792,7 @@ class GWSignal(object):
                 Atot2 = Aps2*Aps2 + Acs2*Acs2
                 Aps3, Acs3 = - (Aps1 + Aps2), - (Acs1 + Acs2)
                 Atot3 = Aps3*Aps3 + Acs3*Acs3
-                tmpSNRsq1 = np.trapz(Atot1/strainGrids, fgrids, axis=0)
+                tmpSNRsq1 = np.trapz(Atot1/strainGrids, fgrids, axis=0) ###JS_EDIT
                 tmpSNRsq2 = np.trapz(Atot2/strainGrids, fgrids, axis=0)
                 tmpSNRsq3 = np.trapz(Atot3/strainGrids, fgrids, axis=0)
                 if self.DutyFactor is not None:
