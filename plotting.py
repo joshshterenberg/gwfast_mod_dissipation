@@ -324,7 +324,7 @@ class CornerPlot:
         self.fig = None
         self.axes = None
 
-    def plot(self, fig=None, title=None, max_figsize=10., max_n_ticks=4,
+    def plot(self, fig=None, title=None, max_figsize=10., max_subplot_size=1.5, max_n_ticks=4,
              label=None, legend_title=None):
         """
         Make a corner plot of the distribution.
@@ -352,7 +352,7 @@ class CornerPlot:
         legend_title: str, optional
             Legend title.
         """
-        self._setup_fig(fig, max_figsize, max_n_ticks=max_n_ticks)
+        self._setup_fig(fig, max_figsize, max_subplot_size, max_n_ticks=max_n_ticks)
 
         for par in self.params:
             self._plot_1d(par, label)
@@ -749,7 +749,7 @@ class MultiCornerPlot:
         self.set_lims = self.corner_plots[0].set_lims
         self.scatter_points = self.corner_plots[0].scatter_points
 
-    def plot(self, max_figsize=10., max_n_ticks=4, title=None,
+    def plot(self, max_figsize=10., max_subplot_size = 1.5, max_n_ticks=4, title=None,
              legend_title=None):
         """
         Make a corner plot with all distributions overlaid.
@@ -770,7 +770,7 @@ class MultiCornerPlot:
         """
         fig = None
         for corner_plot, label in zip(self.corner_plots, self.labels):
-            corner_plot.plot(fig=fig, max_figsize=max_figsize,
+            corner_plot.plot(fig=fig, max_figsize=max_figsize, max_subplot_size=max_subplot_size,
                              max_n_ticks=max_n_ticks, label=label, title=title,
                              legend_title=legend_title)
             fig = corner_plot.fig
