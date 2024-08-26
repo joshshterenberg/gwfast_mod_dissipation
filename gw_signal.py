@@ -474,8 +474,11 @@ class GWSignal(object):
             Ap, Ac = abs(hp)*Fp, abs(hc)*Fc
         else:
             wfAmpl = self.wf_model.Ampl(f, **evParams)
-            Ap = wfAmpl*Fp*0.5*(1.+(np.cos(iota))**2)
-            Ac = wfAmpl*Fc*np.cos(iota)
+            ### Zihan: marginalize over sky location and inclination angle
+            #Ap = wfAmpl*Fp*0.5*(1.+(np.cos(iota))**2)
+            #Ac = wfAmpl*Fc*np.cos(iota)
+            Ap = wfAmpl / np.sqrt(2)
+            Ac = wfAmpl / np.sqrt(2)
         
         return Ap, Ac
     
@@ -693,7 +696,7 @@ class GWSignal(object):
                 else:
                     ### Zihan: marginalize over sky location and inclination angle
                     #return (Ap + 1j*Ac)*np.exp(Psi*1j)
-                    return 2.0/5.0 * wfAmpl * np.exp(Psi*1j)
+                    return 1.0 * wfAmpl * np.exp(Psi*1j)
                 #return np.sqrt(Ap*Ap + Ac*Ac)*np.exp((Psi+phiP)*1j)
         
     
