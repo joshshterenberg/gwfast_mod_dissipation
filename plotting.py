@@ -623,6 +623,8 @@ class CornerPlot:
 
         # Left column and bottom row
         for ax in (*self.axes[-1, :], *self.axes[:, 0]):
+            ax.tick_params(axis='x', labelsize=8) ###JS_EDIT
+            ax.tick_params(axis='y', labelsize=8)
             for axis in ax.xaxis, ax.yaxis:
                 axis.set_major_locator(mpl.ticker.MaxNLocator(max_n_ticks))
 

@@ -120,7 +120,7 @@ _LABELS = {
     'deltaH0': r'$\delta \mathcal{H}_0$', 
     'H0s1ETilde':r'$\mathcal{H}_1^{E}$', ###JS_EDIT
     'kappaTilde':r'$\tilde{\kappa}$',
-    'lambdaTilde':r'$\tilde{\Lambda}$',
+    'lambdaTilde':r'$\tilde{\lambda}$',
     'H0s3ETilde':r'$\mathcal{H}_{3}^{E}$',
     # Love:
     'Lambdat':r'$\tilde{\lambda}$',
