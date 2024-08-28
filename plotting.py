@@ -623,16 +623,16 @@ class CornerPlot:
 
         # Left column and bottom row
         for ax in (*self.axes[-1, :], *self.axes[:, 0]):
-            ax.tick_params(axis='x', labelsize=8) ###JS_EDIT
-            ax.tick_params(axis='y', labelsize=8)
+            ax.tick_params(axis='x', labelsize=12) ###JS_EDIT
+            ax.tick_params(axis='y', labelsize=12)
             for axis in ax.xaxis, ax.yaxis:
                 axis.set_major_locator(mpl.ticker.MaxNLocator(max_n_ticks))
 
         for i, par in enumerate(self.params):
             label = self.latex_labels.with_units(par)
-            if i > 0:
-                self.axes[i, 0].set_ylabel(label)
-            self.axes[-1, i].set_xlabel(label)
+            #if i > 0:
+            #    self.axes[i, 0].set_ylabel(label)
+            #self.axes[-1, i].set_xlabel(label) ###JS_EDIT
 
     def _get_subplot_kwargs(self, max_figsize=10., max_subplot_size=1.5,
                             space=.04):
