@@ -3595,7 +3595,7 @@ class IMRPhenomD_Diss(WaveFormModel):
         ##
 
         theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2)
-        Phi_TDN = qdol_phase.gen_h0_qdol_phase(f, theta_more, fRef_Diss, alpha=0.35, fix_bh_superradiance=False, EBdual=False) ##assuming ref frequency is the same.
+        Phi_TDN = qdol_phase.gen_h0_qdol_phase(f, theta_more, fRef_Diss, alpha=0.35, fix_bh_superradiance=True, EBdual=True) ##assuming ref frequency is the same.
 
         
         #for freq in range(len(fgrid)):
@@ -4044,8 +4044,8 @@ class IMRPhenomD_NRTidalv2_Diss(WaveFormModel):
         H2s3E = kwargs['H2s3E'] #0
         H1s3B = kwargs['H1s3B'] #0
         H2s3B = kwargs['H2s3B'] #0
-        l1 = kwargs['Lambda1']
-        l2 = kwargs['Lambda2']
+        l1 = 0.0 #kwargs['Lambda1']
+        l2 = 0.0 #kwargs['Lambda2']
         ##
 
         theta_more = (M, eta, chi1, chi2, kappa1, kappa2, H1s1E, H2s1E, H1s1B, H2s1B, lambda1, lambda2, H1s3E, H2s3E, H1s3B, H2s3B, H1s0wE, H2s0wE, l1, l2)

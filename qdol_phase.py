@@ -62,6 +62,11 @@ def phase_qdol(f, theta, fix_bh_superradiance, EBdual):
     
     Mc, eta, chi_1, chi_2, kappa1, kappa2, h1s1_E, h2s1_E, h1s1_B, h2s1_B, lambda1, lambda2, \
     h1s3_E, h2s3_E, h1s3_B, h2s3_B, h1s0,h2s0, l1, l2 = theta
+    
+    # change conventions
+    
+    h1s1_E, h2s1_E, h1s1_B, h2s1_B, h1s3_E, h2s3_E, h1s3_B, h2s3_B, h1s0, h2s0 = 0.5 * h1s1_E, 0.5 * h2s1_E, 0.5 * h1s1_B, 0.5 * h2s1_B, 0.5 * h1s3_E, 0.5 * h2s3_E, 0.5 * h1s3_B, 0.5 * h2s3_B, 0.5 * h1s0, 0.5 * h2s0
+
         
     # Mass parameters
     M = Mc / (eta ** (3 / 5))
@@ -101,6 +106,7 @@ def phase_qdol(f, theta, fix_bh_superradiance, EBdual):
     # h2s0 = 16.0 / 45.0 # small spin limit
     # l1 = 0
     # l2 = 0
+    
 
     # Symmetric/antisymmetric spins and spin-induced multipoles
     chi_s = 0.5 * (chi_1 + chi_2)
